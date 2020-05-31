@@ -1,8 +1,10 @@
 package com.shasha.msksmanufacturer.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shasha.msksmanufacturer.services.ChocolateService;
-import com.shasha.msksmanufacturer.web.model.ChocolateDto;
+import com.shasha.msksmanufacturer.services.ChocolateServiceV2;
+import com.shasha.msksmanufacturer.web.controller.v2.ChocolateControllerV2;
+import com.shasha.msksmanufacturer.web.model.v2.ChocolateDtoV2;
+import com.shasha.msksmanufacturer.web.model.v2.ChocolateType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,11 +27,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by kobis on 29 May, 2020
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(ChocolateController.class)
+@WebMvcTest(ChocolateControllerV2.class)
 public class ChocolateControllerTest {
 
     @MockBean
-    ChocolateService chocolateService;
+    ChocolateServiceV2 chocolateServiceV2;
 
     @Autowired
     MockMvc mockMvc;
@@ -37,14 +39,14 @@ public class ChocolateControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    private ChocolateDto validDto;
+    private ChocolateDtoV2 validDto;
 
     @Before
     public void setUp() throws Exception {
-        validDto = ChocolateDto.builder()
+        validDto = ChocolateDtoV2.builder()
                 .id(UUID.randomUUID())
                 .chocolateName("Pikkolo")
-                .chocolateType("Milk")
+                .chocolateType(ChocolateType.MILK)
                 .chocolateSlogan("Crispy pleasure for small gourmets")
                 .upc(123456789L)
                 .build();
@@ -53,14 +55,14 @@ public class ChocolateControllerTest {
     @Test
     public void getItem() throws Exception {
 
-        given(chocolateService.getChocolateByID(any(UUID.class))).willReturn(validDto);
+        given(chocolateServiceV2.getChocolateByID(any(UUID.class))).willReturn(validDto);
 
-        mockMvc.perform(get("/api/v1/chocolate/" + validDto.getId().toString()).accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v2/chocolate/" + validDto.getId().toString()).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(validDto.getId().toString())))
                 .andExpect(jsonPath("$.chocolateName", is(validDto.getChocolateName())))
-                .andExpect(jsonPath("$.chocolateType", is(validDto.getChocolateType())))
+                .andExpect(jsonPath("$.chocolateType", is(validDto.getChocolateType().toString())))
                 .andExpect(jsonPath("$.chocolateSlogan", is(validDto.getChocolateSlogan())))
                 .andExpect(jsonPath("$.upc", is(validDto.getUpc().intValue())));
     }
@@ -70,9 +72,9 @@ public class ChocolateControllerTest {
 
         String chocolateDtoJson = objectMapper.writeValueAsString(validDto);
 
-        given(chocolateService.saveNewChocolate(any())).willReturn(validDto);
+        given(chocolateServiceV2.saveNewChocolate(any())).willReturn(validDto);
 
-        mockMvc.perform(post("/api/v1/chocolate")
+        mockMvc.perform(post("/api/v2/chocolate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(chocolateDtoJson))
                 .andExpect(status().isCreated());
@@ -85,7 +87,7 @@ public class ChocolateControllerTest {
 
         String chocolateDtoJson = objectMapper.writeValueAsString(validDto);
 
-        mockMvc.perform(put("/api/v1/chocolate/" + validDto.getId())
+        mockMvc.perform(put("/api/v2/chocolate/" + validDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(chocolateDtoJson))
                 .andExpect(status().isNoContent());
@@ -96,7 +98,7 @@ public class ChocolateControllerTest {
 
         String chocolateDtoJson = objectMapper.writeValueAsString(validDto);
 
-        mockMvc.perform(delete("/api/v1/chocolate/" + validDto.getId())
+        mockMvc.perform(delete("/api/v2/chocolate/" + validDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content((byte[]) null))
                 .andExpect(status().isNoContent());

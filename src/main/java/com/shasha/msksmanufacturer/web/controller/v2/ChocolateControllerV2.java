@@ -6,14 +6,17 @@ import com.shasha.msksmanufacturer.web.model.v2.ChocolateDtoV2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 /**
  * Created by kobis on 28 May, 2020
  */
 
+@Validated
 @RequestMapping("/api/v2/chocolate")
 @RestController
 public class ChocolateControllerV2 {
@@ -31,7 +34,7 @@ public class ChocolateControllerV2 {
     }
 
     @PostMapping
-    public ResponseEntity addItem(@RequestBody ChocolateDtoV2 chocolateDto) {
+    public ResponseEntity addItem(@Valid @RequestBody ChocolateDtoV2 chocolateDto) {
         ChocolateDtoV2 savedDto = chocolateServiceV2.saveNewChocolate(chocolateDto);
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,7 +44,7 @@ public class ChocolateControllerV2 {
     }
 
     @PutMapping({"/{chocolateID}"})
-    public ResponseEntity updateItem(@PathVariable("chocolateID") UUID chocolateID, @RequestBody ChocolateDtoV2 chocolateDto) {
+    public ResponseEntity updateItem(@PathVariable("chocolateID") UUID chocolateID, @Valid @RequestBody ChocolateDtoV2 chocolateDto) {
 
         chocolateServiceV2.updateChocolate(chocolateID, chocolateDto);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -52,6 +55,16 @@ public class ChocolateControllerV2 {
     public void deleteItem(@PathVariable("chocolateID") UUID chocolateID) {
         chocolateServiceV2.deleteById(chocolateID);
     }
+
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    public ResponseEntity<List>validationErrorHandler(ConstraintViolationException e){
+//        List<String> errors = new ArrayList<>(e.getConstraintViolations().size());
+//        e.getConstraintViolations().forEach(constraintViolation -> {
+//            errors.add(constraintViolation.getPropertyPath()+" : " + constraintViolation.getMessage());
+//        });
+//
+//        return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
+//    }
 
 
 }
