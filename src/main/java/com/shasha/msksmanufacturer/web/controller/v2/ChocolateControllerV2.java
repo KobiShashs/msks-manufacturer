@@ -23,6 +23,7 @@ public class ChocolateControllerV2 {
 
     private final ChocolateServiceV2 chocolateServiceV2;
 
+    //You can remove this CTOR Injection by using @RequiredArgsConstructor in the Controller class level
     public ChocolateControllerV2(ChocolateServiceV2 chocolateServiceV2) {
         this.chocolateServiceV2 = chocolateServiceV2;
     }
@@ -35,9 +36,11 @@ public class ChocolateControllerV2 {
 
     @PostMapping
     public ResponseEntity addItem(@Valid @RequestBody ChocolateDtoV2 chocolateDto) {
-        ChocolateDtoV2 savedDto = chocolateServiceV2.saveNewChocolate(chocolateDto);
+        // ChocolateDtoV2 savedDto = chocolateServiceV2.saveNewChocolate(chocolateDto);
+        var savedDto = chocolateServiceV2.saveNewChocolate(chocolateDto);
 
-        HttpHeaders headers = new HttpHeaders();
+        //  HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.add("Location", "/api/v1/chocolate/" + savedDto.getId().toString());
 
         return new ResponseEntity(headers, HttpStatus.CREATED);

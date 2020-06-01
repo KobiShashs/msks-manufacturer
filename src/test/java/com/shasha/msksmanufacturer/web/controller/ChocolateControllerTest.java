@@ -41,6 +41,8 @@ public class ChocolateControllerTest {
 
     private ChocolateDtoV2 validDto;
 
+    private ChocolateDtoV2 validDtoWithNull;
+
     @Before
     public void setUp() throws Exception {
         validDto = ChocolateDtoV2.builder()
@@ -50,6 +52,15 @@ public class ChocolateControllerTest {
                 .chocolateSlogan("Crispy pleasure for small gourmets")
                 .upc(123456789L)
                 .build();
+
+        validDtoWithNull = ChocolateDtoV2.builder()
+                .chocolateName("Pikkolo")
+                .chocolateType(ChocolateType.MILK)
+                .chocolateSlogan("Crispy pleasure for small gourmets")
+                .upc(123456789L)
+                .build();
+
+
     }
 
     @Test
@@ -70,7 +81,7 @@ public class ChocolateControllerTest {
     @Test
     public void addItem() throws Exception {
 
-        String chocolateDtoJson = objectMapper.writeValueAsString(validDto);
+        String chocolateDtoJson = objectMapper.writeValueAsString(validDtoWithNull);
 
         given(chocolateServiceV2.saveNewChocolate(any())).willReturn(validDto);
 
@@ -85,7 +96,7 @@ public class ChocolateControllerTest {
     @Test
     public void updateItem() throws Exception {
 
-        String chocolateDtoJson = objectMapper.writeValueAsString(validDto);
+        String chocolateDtoJson = objectMapper.writeValueAsString(validDtoWithNull);
 
         mockMvc.perform(put("/api/v2/chocolate/" + validDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
